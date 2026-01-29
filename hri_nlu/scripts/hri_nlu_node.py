@@ -63,15 +63,24 @@ def call_llm(user_text, max_tokens=512):
     output_text = response.get("choices")[0]["text"].strip()
     rospy.loginfo(f"Raw LLM output: {output_text}")
 
+    # EXPECTED_KEYS = ["intent", "object", "location", "person", "color", "confidence"]
+
+    # Attempt to extract the first {...} block
+    json_match = re.search(r"\{.*?\}", output_text, re.DOTALL)
+    if json_match:
+        json_text = json_match.group(0)
+    else:
+        json_text = output_text
+
     # Remove any prefix before the first {
-    json_start = output_text.find("{")
+    json_start = json_text.find("{")
     if json_start == -1:
         rospy.logwarn("No JSON found in LLM output!")
         return None
 
-    json_text = output_text[json_start:] + "}"  # ensure it closes
+    json_end = json_text[json_start:] + "}"  # ensure it closes
     try:
-        data = json.loads(json_text)
+        data = json.loads(json_end)
         return data
     except json.JSONDecodeError as e:
         rospy.logwarn(f"Failed to parse JSON: {e}")
@@ -82,6 +91,10 @@ def call_llm(user_text, max_tokens=512):
 # ------------------------------
 def input_callback(msg):
     data = call_llm(msg.data)
+    print()
+    print("DATA:")
+    print(data)
+    print()
     if not data:
         return
 
