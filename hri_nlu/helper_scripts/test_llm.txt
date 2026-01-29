@@ -1,0 +1,68 @@
+# def call_llm(text):
+#     prompt = SYSTEM_PROMPT + "\nUser: " + text + "\nAssistant:"
+#     result = subprocess.run(
+#         [LLAMA_BIN, "-m", MODEL, "-p", prompt, "--temp", "0"],
+#         capture_output=True, text=True
+#     )
+#     return result.stdout.strip()
+
+# def call_llm(text):
+#     prompt = SYSTEM_PROMPT + "\nUser: " + text + "\nAssistant:"
+#     result = subprocess.run(
+#         [
+#             LLAMA_BIN,
+#             "-m", MODEL,
+#             "--instruct",
+#             "-p", prompt,
+#             "--temp", "0",
+#             "--exit-on-eos"
+#         ],
+#         capture_output=True,
+#         text=True
+#     )
+#     return result.stdout.strip()
+
+
+# def callback(msg):
+#     try:
+#         data = json.loads(call_llm(msg.data))
+#         cmd = HRICommand()
+#         cmd.intent = data.get("intent", "unknown")
+#         cmd.object = data.get("object") or ""
+#         cmd.location = data.get("location") or ""
+#         cmd.person = data.get("person") or ""
+#         cmd.color = data.get("color") or ""
+#         cmd.confidence = float(data.get("confidence", 1.0))
+#         pub.publish(cmd)
+#         rospy.loginfo(f"NLU parsed: {cmd}")
+#     except Exception as e:
+#         rospy.logwarn(f"NLU failed: {e}")
+
+# def callback(msg):
+#     try:
+#         raw = call_llm(msg.data)
+#         import re
+#         import json
+#         match = re.search(r"\{.*\}", raw, re.DOTALL)
+#         if not match:
+#             rospy.logwarn(f"NLU failed: no JSON found in LLM output: {raw}")
+#             return
+#         data = json.loads(match.group(0))
+        
+#         cmd = HRICommand()
+#         cmd.intent = data.get("intent", "unknown")
+#         cmd.object = data.get("object") or ""
+#         cmd.location = data.get("location") or ""
+#         cmd.person = data.get("person") or ""
+#         cmd.color = data.get("color") or ""
+#         cmd.confidence = float(data.get("confidence", 1.0))
+#         pub.publish(cmd)
+#         rospy.loginfo(f"Published command: {cmd}")
+#     except Exception as e:
+#         rospy.logwarn(f"NLU failed: {e}")
+
+
+# rospy.init_node("hri_nlu_node")
+# pub = rospy.Publisher("/hri/command", HRICommand, queue_size=10)
+# rospy.Subscriber("/hri/input_text", String, callback)
+# rospy.spin()
