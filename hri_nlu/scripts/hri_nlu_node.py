@@ -32,7 +32,7 @@ Rules:
 
 Allowed intents:
 bring_object, go_to, find_person, stop, unknown
-a
+
 Required JSON format:
 {
   "intent": "bring_object | go_to | find_person | stop | unknown",
@@ -44,6 +44,7 @@ Required JSON format:
 }
 
 """
+
 
 # ------------------------------
 # LLM call
@@ -57,7 +58,7 @@ def call_llm(user_text, max_tokens=512):
         max_tokens=max_tokens,
         temperature=0.0,
         stop=["}"],  # stop right after the JSON closes
-        echo=False
+        echo=False,
     )
 
     output_text = response.get("choices")[0]["text"].strip()
@@ -86,6 +87,7 @@ def call_llm(user_text, max_tokens=512):
         rospy.logwarn(f"Failed to parse JSON: {e}")
         return None
 
+
 # ------------------------------
 # ROS callback
 # ------------------------------
@@ -108,6 +110,7 @@ def input_callback(msg):
 
     pub.publish(cmd)
     rospy.loginfo(f"[NLU] Published command: {cmd}")
+
 
 # ------------------------------
 # Main ROS node
